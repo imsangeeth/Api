@@ -35,7 +35,7 @@ class User extends CI_Controller {
          $this->load->view('404.php');
 	 }
 
-	public function index($ky='0')
+	public function index()
 	{
 
 	 $all = $this->User_model->Check_user($ky);
@@ -291,6 +291,40 @@ class User extends CI_Controller {
 			echo json_encode(array('Error'=> false ,'status' => 'something went wrong'));
 		}
 	}
+
+
+	//start from here
+	
+	public function createcustomer()
+	{
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		if($request)
+		{ 
+			$account =  $request->account;
+			echo $account;
+		}
+		
+		
+	}
+
+	public function viewcustomer()
+	{
+		$all_customer = $this->User_model->customer_details();
+	   
+		foreach($all_customer as $singlerow)
+		  {
+			  $all[] = array('id' => $singlerow->id,'name' => $singlerow->username,'email' => $singlerow->email,'phonenumber' => $singlerow->mobile_number);
+
+		  }
+
+      echo json_encode($all);
+
+	}
+
+
+
 
 }
 

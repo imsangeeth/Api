@@ -73,6 +73,15 @@ class User_model extends CI_Model {
 
        }
 
+       //start here
+        
+       public function customer_details()
+       {
+         //$this->db->where('admin_id',$ky);
+         return $this->db->get('csp_createcustomer')->result();
+       }
+
+
 
 
 
