@@ -81,6 +81,12 @@ class User_model extends CI_Model {
          return $this->db->get('csp_createcustomer')->result();
        }
 
+       public function createcustomer($name,$lastName,$DOB,$nationality,$emiratesid,$email,$insurance,$insurancecompany,$homeaddress,$companyaddress,$mobilenumber,$gender)
+        {
+           $data = array('firstname' => $name,'lastname' => $lastName,'DOB' => $DOB,'email' => $email,'mobile_number' => $mobilenumber,'gender' =>$gender,'nationality' =>$nationality,'emirates_id' => $emiratesid,'insurance_card_no' =>$insurance,'insurance_company' => $insurancecompany,'home_address' => $homeaddress,'company_address' => $companyaddress  );
+           return $this->db->insert('csp_createcustomer',$data);
+        }
+
 
 
 

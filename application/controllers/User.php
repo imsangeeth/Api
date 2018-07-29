@@ -302,8 +302,33 @@ class User extends CI_Controller {
 
 		if($request)
 		{ 
-			$account =  $request->account;
-			echo $account;
+		  $name =  $request->name;
+		  $lastName =  $request->lastName;
+		  $DOB =  $request->DOB;
+          $nationality =  $request->nationality;
+		  $emiratesid =  $request->emiratesid;
+		  $email =  $request->email;
+		  $insurance =  $request->insurance;
+          $insurancecompany =  $request->insurancecompany;
+		  $homeaddress =  $request->homeaddress;
+		  $companyaddress =  $request->companyaddress;
+		  $mobilenumber = $request->mobilenumber;
+		  $gender = $request->gender;
+
+          $create = $this->User_model->Createcustomer($name,$lastName,$DOB,$nationality,$emiratesid,$email,$insurance,$insurancecompany,$homeaddress,$companyaddress,$mobilenumber,$gender);
+
+		 if($create)
+		 {
+            echo json_encode('sucess');
+		 }else
+		 {
+			echo json_encode('Failed');
+		 }
+
+
+
+
+
 		}
 		
 		
