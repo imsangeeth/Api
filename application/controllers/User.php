@@ -326,12 +326,39 @@ class User extends CI_Controller {
 		 }
 
 
-
-
-
 		}
 		
 		
+	}
+
+	public function createcontact()
+	{
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		  $destinationNumbVal =  $request->destinationNumbVal;
+		  $DialerVal =  $request->DialerVal;
+		  $PrioVal =  $request->PrioVal;
+          $StartTimeVal =  $request->StartTimeVal;
+		  $StartDtval =  $request->StartDtval;
+		  $StopTimeVal =  $request->StopTimeVal;
+		  $StopDateVal =  $request->StopDateVal;
+		  $CallTagVal =  $request->CallTagVal;
+		  $CallTagtrackVal =  $request->CallTagtrackVal;
+		
+
+		  $insert = $this->User_model->createcontact($destinationNumbVal,$DialerVal,$PrioVal,$StartTimeVal,$StartDtval,$StopDateVal,$StopTimeVal,$CallTagVal,$CallTagtrackVal);
+		
+		  if($insert)
+		   {
+              echo json_encode(array('error' => false,'msg' => 'Sucess'));
+		   }	
+		  else{
+
+			echo json_encode(array('error' => true,'msg' => 'Something Wrong'));
+		  }
+
+
 	}
 
 	public function viewcustomer()
@@ -340,7 +367,7 @@ class User extends CI_Controller {
 	   
 		foreach($all_customer as $singlerow)
 		  {
-			  $all[] = array('id' => $singlerow->id,'name' => $singlerow->username,'email' => $singlerow->email,'phonenumber' => $singlerow->mobile_number);
+			  $all[] = array('id' => $singlerow->id,'name' => $singlerow->firstname,'email' => $singlerow->email,'phonenumber' => $singlerow->mobile_number);
 
 		  }
 

@@ -88,6 +88,13 @@ class User_model extends CI_Model {
         }
 
 
+        public function createcontact($destinationNumbVal,$DialerVal,$PrioVal,$StartTimeVal,$StartDtval,$StopDateVal,$StopTimeVal,$CallTagVal,$CallTagtrackVal)
+        {
+           $data = array('destinationumber' => $destinationNumbVal,'dialer' => $DialerVal,'Prio' => $PrioVal,'startTime' => $StartTimeVal,'StartDate' => $StartDtval,'StopTime' =>$StopTimeVal,'StopDate' =>$StopDateVal,'CallTag_name' => $CallTagVal,'CallTag_Trackid' =>$CallTagtrackVal);
+           return $this->db->insert('csp_createcontact',$data);
+        }
+
+
 
 
 
