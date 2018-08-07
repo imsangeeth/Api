@@ -27,6 +27,7 @@ class User extends CI_Controller {
 			$this->load->helper('url_helper');
 			$this->load->helper(array('form', 'url'));
 			$this->load->library('session');
+			//error_reporting(0);
 	}
 	 
 
@@ -351,11 +352,11 @@ class User extends CI_Controller {
 		
 		  if($insert)
 		   {
-              echo json_encode(array('error' => false,'msg' => 'Sucess'));
+              echo json_encode(array('error' => false,'msg' => 'Sucessfully created', 'bgclr' => '#4CAF50 !important'));
 		   }	
 		  else{
 
-			echo json_encode(array('error' => true,'msg' => 'Something Wrong'));
+			echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
 		  }
 
 
@@ -367,13 +368,41 @@ class User extends CI_Controller {
 	   
 		foreach($all_customer as $singlerow)
 		  {
-			  $all[] = array('id' => $singlerow->id,'name' => $singlerow->firstname,'email' => $singlerow->email,'phonenumber' => $singlerow->mobile_number);
+			  $all[] = array('id' => $singlerow->id,'firstname' => $singlerow->firstname,'email' => $singlerow->email,'phonenumber' => $singlerow->mobile_number);
 
 		  }
 
-      echo json_encode($all);
+		  $json = array('total_count' => '30','items' => $all);
+
+      echo json_encode($json);
 
 	}
+
+	public function allcontacts($sort="sort23",$order='asc',$page=1)
+	 {
+		
+		//echo $sort.$order.$page; 
+
+		 $allcontacts = $this->User_model->allcontacts($sort,$order,$page);
+		 $totalcount = count($allcontacts);
+		 $i = 0;
+		 
+		 $pagestart = $page * 10;
+		 $pageend = $pagestart - 10;
+
+		 foreach($allcontacts as $singlerow)
+		  {
+			  $i++;
+			  $all[] = array('userid' => $singlerow->id,'destinationumber' => $singlerow->destinationumber,'dialer' => $singlerow->dialer,'startTime' => $singlerow->startTime,'StartDate' => $singlerow->StartDate,'StopTime' => $singlerow->StopTime,'StopDate' => $singlerow->StopDate,'Prio' => $singlerow->Prio,'CallTag_name' =>$singlerow->CallTag_name,'CallTag_Trackid' => $singlerow->CallTag_Trackid );
+
+		  }
+
+		  $json = array('total_count' => 25,'items' => $all,'sort' => $sort,'order' =>$order,'page' => $page,'pageend' => $pageend,'pagestart' => $pagestart);
+
+          echo json_encode($json);
+  
+
+	 }
 
 
 

@@ -80,6 +80,18 @@ class User_model extends CI_Model {
          //$this->db->where('admin_id',$ky);
          return $this->db->get('csp_createcustomer')->result();
        }
+      
+       public function allcontacts($sort,$order,$page)
+       {
+        $page = $page - 1;
+        $pagestart = $page * 10;
+        $pageend = $pagestart - 10;
+
+          return $this->db->get('csp_createcontact',10,$pagestart)->result();
+             //  $this->db->order_by($sort,$order);
+        
+       }
+
 
        public function createcustomer($name,$lastName,$DOB,$nationality,$emiratesid,$email,$insurance,$insurancecompany,$homeaddress,$companyaddress,$mobilenumber,$gender)
         {
