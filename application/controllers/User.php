@@ -27,7 +27,8 @@ class User extends CI_Controller {
 			$this->load->helper('url_helper');
 			$this->load->helper(array('form', 'url'));
 			$this->load->library('session');
-			//error_reporting(0);
+			$this->load->library('encryption');
+						//error_reporting(0);
 	}
 	 
 
@@ -337,6 +338,9 @@ class User extends CI_Controller {
 		$postdata = file_get_contents("php://input");
 		$request = json_decode($postdata);
 
+		if($request)
+		{ 
+
 		  $destinationNumbVal =  $request->destinationNumbVal;
 		  $DialerVal =  $request->DialerVal;
 		  $PrioVal =  $request->PrioVal;
@@ -352,15 +356,89 @@ class User extends CI_Controller {
 		
 		  if($insert)
 		   {
-              echo json_encode(array('error' => false,'msg' => 'Sucessfully created', 'bgclr' => '#4CAF50 !important'));
+              echo json_encode(array('error' => false,'msg' => 'Sucessfully Created', 'bgclr' => '#4CAF50 !important'));
+		   }	
+		  else{
+
+			echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
+		  }
+  
+		}
+
+	}
+
+
+
+	public function createservices()
+	{
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		if($request)
+		{ 
+
+		  $customername =  $request->customername;
+		  $Reason =  $request->Reason;
+		  $callerTime =  $request->callerTime;
+          $callerdate =  $request->callerdate;
+		  $callerType =  $request->callerType;
+		  $customerType =  $request->customerType;
+		  $Remarks =  $request->Remarks;
+
+		 
+
+		  $insert = $this->User_model->createservices($customername,$Reason,$callerTime,$callerdate,$callerType,$customerType,$Remarks);
+		
+		  if($insert)
+		   {
+              echo json_encode(array('error' => false,'msg' => 'Sucessfully Created', 'bgclr' => '#4CAF50 !important'));
 		   }	
 		  else{
 
 			echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
 		  }
 
+		}
+	}
+
+
+    public function createcampaign()
+	{
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		if($request)
+		{ 
+
+		  $Campaignname =  $request->Campaignname;
+		  $Mode =  $request->Mode;
+		  $Scheduletime =  $request->Scheduletime;
+          $Campaigndate =  $request->Campaigndate;
+		  $Scheduledate =  $request->Scheduledate;
+		  $serviceprovider =  $request->serviceprovider;
+		  $Campaigndes =  $request->Campaigndes;
+		  $cmmpid = time().rand(1000,10000);
+
+		  $insert = $this->User_model->createcampaign($cmmpid,$Campaignname,$Mode,$Scheduletime,$Campaigndate,$Scheduledate,$serviceprovider,$Campaigndes);
+		
+		  if($insert)
+		   {
+              echo json_encode(array('error' => false,'msg' => 'Sucessfully Created', 'bgclr' => '#4CAF50 !important'));
+		   }	
+		  else{
+
+			echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
+		  }
+
+		}
+
 
 	}
+
+
+
+
+
 
 	public function viewcustomer()
 	{
@@ -378,15 +456,15 @@ class User extends CI_Controller {
 
 	}
 
-	public function allcontacts($sort="sort23",$order='asc',$page=1)
+	public function allcontacts($sort="2d242uyz",$order='asc',$page=1)
 	 {
-		
-		//echo $sort.$order.$page; 
 
+		 $totalcontact = $this->User_model->totalcontact();
 		 $allcontacts = $this->User_model->allcontacts($sort,$order,$page);
 		 $totalcount = count($allcontacts);
+		 $totalcontact_ct = count($totalcontact);
 		 $i = 0;
-		 
+ 
 		 $pagestart = $page * 10;
 		 $pageend = $pagestart - 10;
 
@@ -397,11 +475,65 @@ class User extends CI_Controller {
 
 		  }
 
-		  $json = array('total_count' => 25,'items' => $all,'sort' => $sort,'order' =>$order,'page' => $page,'pageend' => $pageend,'pagestart' => $pagestart);
+		  $json = array('total_count' => $totalcontact_ct,'items' => $all,'sort' => $sort,'order' =>$order,'page' => $page,'pageend' => $pageend,'pagestart' => $pagestart);
 
           echo json_encode($json);
-  
+	 }
 
+	 public function allservices($sort="2d242uyz",$order='asc',$page=1)
+	 {
+		if($sort == 'CustomerName') { $sort = 'customer_name'; }  
+		 $totalservice = $this->User_model->totalservices();
+		 $allservices = $this->User_model->allservices($sort,$order,$page);
+		 $totalcount = count($allservices);
+		 $totalservice_ct = count($totalservice);
+		 $i = 0;
+		 
+        
+
+		 $pagestart = $page * 10;
+		 $pageend = $pagestart - 10;
+
+		 foreach($allservices as $singlerow)
+		  {
+			  $i++;
+			  $all[] = array('CustomerName' => $singlerow->customer_name,'ReasonForCall' => $singlerow->reasonforcall,'CallerTime' => $singlerow->callertime,'CallerDate' => $singlerow->callerdate,'CallerType' => $singlerow->callertype,'CustomerType' => $singlerow->customertype,'remarks' => $singlerow->remarks);
+
+		  }
+
+		  $json = array('total_count' => $totalservice_ct,'items' => $all,'sort' => $sort,'order' =>$order,'page' => $page,'pageend' => $pageend,'pagestart' => $pagestart);
+
+          echo json_encode($json);
+	 }
+
+
+	 public function allcampaign($sort="342werd34",$order='asc',$page=1)
+	 {
+		if($sort == 'Campaignname') { $sort = 'campaign_name'; } 
+		if($sort == 'ScheduleDate') { $sort = 'schedule_date'; }  
+		if($sort == 'CampaignDate') { $sort = 'campaign_date'; }  
+		if($sort == 'ServiceProvider') { $sort = 'service_provider'; }   
+ 
+
+		 $totalcampaign = $this->User_model->totalcampaign();
+		 $allcampaign = $this->User_model->allcampaign($sort,$order,$page);
+		 $totalcount = count($allcampaign);
+		 $totalservice_ct = count($totalcampaign);
+		 $i = 0;
+		 
+		 $pagestart = $page * 10;
+		 $pageend = $pagestart - 10;
+
+		 foreach($allcampaign as $singlerow)
+		  {
+			  $i++;
+			  $all[] = array('Campaignname' => $singlerow->campaign_name,'Mode' => $singlerow->mode,'ScheduleTime' => $singlerow->schedule_time,'ScheduleDate' => $singlerow->schedule_date,'CampaignDate' => $singlerow->campaign_date,'ServiceProvider' => $singlerow->service_provider);
+
+		  }
+
+		  $json = array('total_count' => $totalservice_ct,'items' => $all,'sort' => $sort,'order' =>$order,'page' => $page,'pageend' => $pageend,'pagestart' => $pagestart);
+
+          echo json_encode($json);
 	 }
 
 
