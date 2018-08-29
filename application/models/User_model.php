@@ -161,10 +161,13 @@ class User_model extends CI_Model {
            return $this->db->insert('csp_createcustomer',$data);
         }
 
+       
 
-        public function createservices($customername,$Reason,$callerTime,$callerdate,$callerType,$customerType,$Remarks)
+        public function createservices($customername,$Reason,$Description,$Subject,$Received,$priority,$assign,$department,$ticketstatus,$duedate,$phonenumber,$policynumber)
         {
-           $data = array('customer_name' => $customername,'reasonforcall' => $Reason,'callertime' => $callerTime,'callerdate' => $callerdate,'callertype' => $callerType,'customertype' =>$customerType,'remarks' =>$Remarks,'createtime' => date('Y-m-d h:i:s'));
+          $ticktid = 'Af'.time().rand(10,100);
+
+           $data = array('user_id'=> '1','ticket_id' => $ticktid,'user_type' => 'admin','customer_name' => $customername,'reasonforcall' => $Reason,'description' => $Description,'subject' => $Subject,'received' => $Received,'priority' =>$priority,'assign' =>$assign,'department' => $department,'duedate' => $duedate,'ticketstatus' =>$ticketstatus,'phonenumber' =>$phonenumber,'policynumber' =>$policynumber,'createtime' => date('Y-m-d h:i:s'));
            return $this->db->insert('csp_services',$data);
         }
        
@@ -174,6 +177,18 @@ class User_model extends CI_Model {
            $data = array('destinationumber' => $destinationNumbVal,'dialer' => $DialerVal,'Prio' => $PrioVal,'startTime' => $StartTimeVal,'StartDate' => $StartDtval,'StopTime' =>$StopTimeVal,'StopDate' =>$StopDateVal,'CallTag_name' => $CallTagVal,'CallTag_Trackid' =>$CallTagtrackVal);
            return $this->db->insert('csp_createcontact',$data);
         }
+
+
+        public function updatecontact($destinationNumbVal,$DialerVal,$PrioVal,$StartTimeVal,$StartDtval,$StopDateVal,$StopTimeVal,$CallTagVal,$CallTagtrackVal,$contactId)
+        {
+
+           
+
+           $data = array('destinationumber' => $destinationNumbVal,'dialer' => $DialerVal,'Prio' => $PrioVal,'startTime' => $StartTimeVal,'StartDate' => $StartDtval,'StopTime' =>$StopTimeVal,'StopDate' =>$StopDateVal,'CallTag_name' => $CallTagVal,'CallTag_Trackid' =>$CallTagtrackVal);
+
+                   $this->db->where('id',$contactId);
+           return $this->db->update('csp_createcontact',$data);
+        }
          
         public function createcampaign($cmmpid,$Campaignname,$Mode,$Scheduletime,$Campaigndate,$Scheduledate,$serviceprovider,$Campaigndes)
         {
@@ -181,6 +196,14 @@ class User_model extends CI_Model {
            $data = array('camp_id' => $cmmpid , 'campaign_name' => $Campaignname,'mode' => $Mode,'schedule_time' => $Scheduletime,'schedule_date' => $Scheduledate,'campaign_date' => $Campaigndate,'service_provider' =>$serviceprovider,'campaign_description' =>$Campaigndes );
            return $this->db->insert('csp_campaign',$data);
         }
+
+
+        public function editcontact($id)
+         {
+            $this->db->where('id',$id);
+            return $this->db->get('csp_createcontact')->row();
+         }
+
 
     
 

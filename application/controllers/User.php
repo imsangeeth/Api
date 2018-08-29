@@ -379,15 +379,18 @@ class User extends CI_Controller {
 
 		  $customername =  $request->customername;
 		  $Reason =  $request->Reason;
-		  $callerTime =  $request->callerTime;
-          $callerdate =  $request->callerdate;
-		  $callerType =  $request->callerType;
-		  $customerType =  $request->customerType;
-		  $Remarks =  $request->Remarks;
+		  $Description =  $request->Description;
+          $Subject =  $request->Subject;
+		  $Received =  $request->Received;
+		  $priority =  $request->priority;
+		  $assign =  $request->assign;
+		  $department =  $request->department;
+          $ticketstatus =  $request->ticketstatus;
+		  $duedate =  $request->duedate;
+		  $phonenumber =  $request->phonenumber;
+		  $policynumber =  $request->policynumber;
 
-		 
-
-		  $insert = $this->User_model->createservices($customername,$Reason,$callerTime,$callerdate,$callerType,$customerType,$Remarks);
+		  $insert = $this->User_model->createservices($customername,$Reason,$Description,$Subject,$Received,$priority,$assign,$department,$ticketstatus,$duedate,$phonenumber,$policynumber);
 		
 		  if($insert)
 		   {
@@ -497,7 +500,7 @@ class User extends CI_Controller {
 		 foreach($allservices as $singlerow)
 		  {
 			  $i++;
-			  $all[] = array('CustomerName' => $singlerow->customer_name,'ReasonForCall' => $singlerow->reasonforcall,'CallerTime' => $singlerow->callertime,'CallerDate' => $singlerow->callerdate,'CallerType' => $singlerow->callertype,'CustomerType' => $singlerow->customertype,'remarks' => $singlerow->remarks);
+			  $all[] = array('ticket_id' => $singlerow->ticket_id,'customer_name' => $singlerow->customer_name,'phonenumber' => $singlerow->phonenumber,'department' => $singlerow->department,'assign' => $singlerow->assign,'duedate' => $singlerow->duedate);
 
 		  }
 
@@ -536,6 +539,57 @@ class User extends CI_Controller {
           echo json_encode($json);
 	 }
 
+
+	 public function editcontact($id=0)
+	 {
+		
+	   $singlerow = $this->User_model->editcontact($id);
+	   $all = '';
+
+	   if($singlerow)
+	     {
+			//$StartDate = date('m/d/Y',strtotime($singlerow->StartDate));
+
+			$all = array('userid' => $singlerow->id,'DestinatioNumber' => $singlerow->destinationumber,'dialer' => $singlerow->dialer,'StartTime' => $singlerow->startTime,'StartDate' => $singlerow->StartDate,'StopTime' => $singlerow->StopTime,'StopDate' => $singlerow->StopDate,'Prio' => $singlerow->Prio,'CallTag_name' =>$singlerow->CallTag_name,'CallTagTrackid' => $singlerow->CallTag_Trackid );
+		 }
+		 
+      echo json_encode($all);
+	 }
+	 
+	 public function updatecontact()
+	 {
+		 
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		if($request)
+		{ 
+
+		  $destinationNumbVal =  $request->destinationNumbVal;
+		  $DialerVal =  $request->DialerVal;
+		  $PrioVal =  $request->PrioVal;
+          $StartTimeVal =  $request->StartTimeVal;
+		  $StartDtval =  $request->StartDtval;
+		  $StopTimeVal =  $request->StopTimeVal;
+		  $StopDateVal =  $request->StopDateVal;
+		  $CallTagVal =  $request->CallTagVal;
+		  $CallTagtrackVal =  $request->CallTagtrackVal;
+		  $contactId = $request->contactIdval;
+
+		  $insert = $this->User_model->updatecontact($destinationNumbVal,$DialerVal,$PrioVal,$StartTimeVal,$StartDtval,$StopDateVal,$StopTimeVal,$CallTagVal,$CallTagtrackVal,$contactId);
+		
+		  if($insert)
+		   {
+              echo json_encode(array('error' => false,'msg' => 'Sucessfully Updated', 'bgclr' => '#4CAF50 !important'));
+		   }	
+		  else{
+
+			echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
+		  }
+  
+		}
+
+	 }
 
 
 
