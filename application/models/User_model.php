@@ -82,19 +82,28 @@ class User_model extends CI_Model {
          return $this->db->get('csp_createcustomer')->result();
        }
       
-       public function allcontacts($sort,$order,$page)
+       public function allcontacts($sort,$order,$page,$name)
        {
         $page = $page - 1;
         $pagestart = $page * 10;
         $pageend = $pagestart - 10;
 
-        if($sort == "2d242uyz" || $sort == "created")
+        if($name !='Imp')
         {
-          return $this->db->get('csp_createcontact',10,$pagestart)->result();
+          $this->db->like('firstname',$name);
+          $this->db->or_like('companyname',$name);
+          $this->db->or_like('title',$name);
+          $this->db->or_like('emirates_id',$name);
+          return $this->db->get('csp_createcustomer',10,$pagestart)->result();
+          
+        }
+        else if($sort == "2d242uyz" || $sort == "created")
+        {          $this->db->order_by('id','desc');
+          return $this->db->get('csp_createcustomer',10,$pagestart)->result();
         }
         else{
           $this->db->order_by($sort,$order);
-          return $this->db->get('csp_createcontact',10,$pagestart)->result();
+          return $this->db->get('csp_createcustomer',10,$pagestart)->result();
         }
           
              //  $this->db->order_by($sort,$order);
@@ -156,7 +165,7 @@ class User_model extends CI_Model {
 
        public function totalcontact()
         {
-          return $this->db->get('csp_createcontact')->result();
+          return $this->db->get('csp_createcustomer')->result();
         }
 
         public function totalservices()
@@ -170,10 +179,16 @@ class User_model extends CI_Model {
         }
 
 
-       public function createcustomer($name,$lastName,$DOB,$nationality,$emiratesid,$email,$insurance,$insurancecompany,$homeaddress,$companyaddress,$mobilenumber,$gender)
+       public function createcustomer($name,$lastName,$Title,$companyname,$mobilenumber,$dob,$Gender,$Nationality,$email,$Source,$Type,$emiratesId,$insurancecard,$insurancecompany,$homeaddress,$Companyaddress)
         {
-           $data = array('firstname' => $name,'lastname' => $lastName,'DOB' => $DOB,'email' => $email,'mobile_number' => $mobilenumber,'gender' =>$gender,'nationality' =>$nationality,'emirates_id' => $emiratesid,'insurance_card_no' =>$insurance,'insurance_company' => $insurancecompany,'home_address' => $homeaddress,'company_address' => $companyaddress  );
+           $data = array('firstname' => $name,'lastname' => $lastName,'DOB' => $dob,'email' => $email,
+           'mobile_number' => $mobilenumber,'gender' =>$Gender,'nationality' =>$Nationality,
+           'emirates_id' => $emiratesId,'insurance_card_no' =>$insurancecard,'insurance_company' => $insurancecompany,
+           'home_address' => $homeaddress,'company_address' => $Companyaddress,'title' => $Title,'companyname' => $companyname,'Source' => $Source,'Type' => $Type
+             );
+
            return $this->db->insert('csp_createcustomer',$data);
+
         }
 
        
@@ -183,7 +198,13 @@ class User_model extends CI_Model {
           $ticktid = time();
 
            $data = array('user_id'=> '1','ticket_id' => $ticktid,'user_type' => 'admin','customer_name' => $customername,'reasonforcall' => $Reason,'description' => $Description,'subject' => $Subject,'received' => $Received,'priority' =>$priority,'assign' =>$assign,'department' => $department,'duedate' => $duedate,'ticketstatus' =>$ticketstatus,'phonenumber' =>$phonenumber,'policynumber' =>$policynumber,'createtime' => date('Y-m-d h:i:s'));
-           return $this->db->insert('csp_services',$data);
+            $this->db->insert('csp_services',$data);
+           
+            $insert_id = $this->db->insert_id();
+           
+            $audit = array('heading' => 'Ticket created at','message' => 'Administration created','generate_date' => date('Y-d-m h:s'),'ticket_id' =>$insert_id );
+            return $this->db->insert('csp_services',$audit);
+
         }
 
         public function Updateservices($ticketid,$customername,$Reason,$Description,$Subject,$Received,$priority,$assign,$department,$ticketstatus,$duedate,$phonenumber,$policynumber)

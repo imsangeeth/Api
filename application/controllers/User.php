@@ -304,27 +304,33 @@ class User extends CI_Controller {
 
 		if($request)
 		{ 
-		  $name =  $request->name;
-		  $lastName =  $request->lastName;
-		  $DOB =  $request->DOB;
-          $nationality =  $request->nationality;
-		  $emiratesid =  $request->emiratesid;
-		  $email =  $request->email;
-		  $insurance =  $request->insurance;
-          $insurancecompany =  $request->insurancecompany;
+		  $name =  $request->firstName;
+		  $lastName =  $request->lastname;
+		  $Title = $request->Title;
+		  $companyname =  $request->companyname;
+          $mobilenumber =  $request->mobilenumber;
+		  $dob =  $request->dob;
+		  $Gender =  $request->Gender;
+		  $Nationality =  $request->Nationality;
+          $email =  $request->email;
+		  $Source =  $request->Source;
+		  $Type =  $request->Type;
+		  $emiratesId = $request->emiratesId;
+		  $insurancecard = $request->insurancecard;
+		  $insurancecompany =  $request->insurancecompany;
 		  $homeaddress =  $request->homeaddress;
-		  $companyaddress =  $request->companyaddress;
-		  $mobilenumber = $request->mobilenumber;
-		  $gender = $request->gender;
+		  $Companyaddress = $request->Companyaddress;
+		 
 
-          $create = $this->User_model->Createcustomer($name,$lastName,$DOB,$nationality,$emiratesid,$email,$insurance,$insurancecompany,$homeaddress,$companyaddress,$mobilenumber,$gender);
+		  $create = $this->User_model->Createcustomer($name,$lastName,$Title,$companyname,$mobilenumber,$dob,$Gender,$Nationality,$email,$Source,$Type,$emiratesId,$insurancecard,$insurancecompany,$homeaddress,$Companyaddress);
 
-		 if($create)
-		 {
-            echo json_encode('sucess');
-		 }else
-		 {
-			echo json_encode('Failed');
+		  if($create)
+		  {
+			 echo json_encode(array('error' => false,'msg' => 'Sucessfully Created', 'bgclr' => '#4CAF50 !important'));
+		  }	
+		 else{
+
+		   echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
 		 }
 
 
@@ -490,11 +496,16 @@ class User extends CI_Controller {
 
 	}
 
-	public function allcontacts($sort="2d242uyz",$order='asc',$page=1)
+	public function allcontacts($sort="2d242uyz",$name='Imp', $page=1,$order='asc')
 	 {
 
+
+		if($sort == 'name') { $sort = 'firstname'; }
+		if($sort == 'PolicyNumber') { $sort = 'title'; }
+		if($sort == 'InsuredAmount') { $sort = 'emirates_id'; }
+
 		 $totalcontact = $this->User_model->totalcontact();
-		 $allcontacts = $this->User_model->allcontacts($sort,$order,$page);
+		 $allcontacts = $this->User_model->allcontacts($sort,$order,$page,$name);
 		 $totalcount = count($allcontacts);
 		 $totalcontact_ct = count($totalcontact);
 		 $i = 0;
@@ -509,7 +520,11 @@ class User extends CI_Controller {
 		 foreach($allcontacts as $singlerow)
 		  {
 			  $iserviceview++;
-			  $all[] = array('slno' => $iserviceview ,'userid' => $singlerow->id,'destinationumber' => $singlerow->destinationumber,'dialer' => $singlerow->dialer,'startTime' => $singlerow->startTime,'StartDate' => $singlerow->StartDate,'StopTime' => $singlerow->StopTime,'StopDate' => $singlerow->StopDate,'Prio' => $singlerow->Prio,'CallTag_name' =>$singlerow->CallTag_name,'CallTag_Trackid' => $singlerow->CallTag_Trackid );
+
+              $name = $singlerow->firstname.' '.$singlerow->lastname;
+
+			  $all[] = array('slno' => $iserviceview ,'userid' => $singlerow->id,'name' => $name,'insurancecard' => $singlerow->insurance_card_no,
+			  'companyname' => $singlerow->companyname,'PolicyNumber' => $singlerow->title,'InsuredAmount' => $singlerow->emirates_id);
 
 		  }
 
