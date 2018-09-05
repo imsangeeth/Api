@@ -101,16 +101,31 @@ class User_model extends CI_Model {
        }
 
 
-       public function allservices($sort,$order,$page)
+       public function allservices($sort,$order,$page,$name,$assignsort)
        {
         $page = $page - 1;
         $pagestart = $page * 10;
         $pageend = $pagestart - 10;
 
-        if($sort == "2d242uyz" || $sort == "created")
+        if($name !='Imp')
         {
+          $this->db->like('ticket_id',$name);
+          $this->db->or_like('customer_name',$name);
+          
+          $this->db->or_like('Duedate',$name);	
           return $this->db->get('csp_services',10,$pagestart)->result();
         }
+        else if($assignsort !='0')
+        {
+          $this->db->or_like('assign',$assignsort);	
+          return $this->db->get('csp_services',10,$pagestart)->result();
+        }
+        else if($sort == "2d242uyz" || $sort == "created")
+        {        
+          $this->db->order_by('id','desc');
+          return $this->db->get('csp_services',10,$pagestart)->result();
+        }
+        
         else{
           $this->db->order_by($sort,$order);
           return $this->db->get('csp_services',10,$pagestart)->result();
@@ -165,10 +180,23 @@ class User_model extends CI_Model {
 
         public function createservices($customername,$Reason,$Description,$Subject,$Received,$priority,$assign,$department,$ticketstatus,$duedate,$phonenumber,$policynumber)
         {
-          $ticktid = 'Af'.time().rand(10,100);
+          $ticktid = time();
 
            $data = array('user_id'=> '1','ticket_id' => $ticktid,'user_type' => 'admin','customer_name' => $customername,'reasonforcall' => $Reason,'description' => $Description,'subject' => $Subject,'received' => $Received,'priority' =>$priority,'assign' =>$assign,'department' => $department,'duedate' => $duedate,'ticketstatus' =>$ticketstatus,'phonenumber' =>$phonenumber,'policynumber' =>$policynumber,'createtime' => date('Y-m-d h:i:s'));
            return $this->db->insert('csp_services',$data);
+        }
+
+        public function Updateservices($ticketid,$customername,$Reason,$Description,$Subject,$Received,$priority,$assign,$department,$ticketstatus,$duedate,$phonenumber,$policynumber)
+        {
+         
+
+           $data = array('customer_name' => $customername,'reasonforcall' => $Reason,
+           'description' => $Description,'subject' => $Subject,'received' => $Received,'priority' =>$priority,'assign' =>$assign,
+           'department' => $department,'duedate' => $duedate,'ticketstatus' =>$ticketstatus,'phonenumber' =>$phonenumber,
+           'policynumber' =>$policynumber);
+
+                  $this->db->where('ticket_id', $ticketid);
+           return $this->db->update('csp_services',$data);
         }
        
 
@@ -203,6 +231,40 @@ class User_model extends CI_Model {
             $this->db->where('id',$id);
             return $this->db->get('csp_createcontact')->row();
          }
+        
+         public function singledeatils($id)
+         {
+            $this->db->where('ticket_id',$id);
+            return $this->db->get('csp_services')->row();
+         }
+
+         public function taskcomments($id)
+         {
+            $this->db->order_by('id','desc');
+            $this->db->where('ticket_id',$id);
+            return $this->db->get('csp_task_comment')->result();
+         }
+
+         public function auditdeatils($id)
+         {
+            
+            $this->db->where('ticket_id',$id);
+            return $this->db->get('csp_audit')->result();
+         }
+
+         public function addcomment($comment,$taskid)
+          {
+            $data = array('message' => $comment,'ticket_id' =>$taskid,'comment_time' => date('d-m-Y h:s') );
+            return  $this->db->insert('csp_task_comment',$data);
+          }
+
+          public function checkUser($username,$password)
+          {
+              $this->db->where('username',$username);
+              $this->db->where('password',$password);
+              return $this->db->get('csp_users')->row();
+          }
+
 
 
     

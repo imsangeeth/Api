@@ -404,6 +404,42 @@ class User extends CI_Controller {
 		}
 	}
 
+	public function Updateservices()
+	{
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		if($request)
+		{ 
+
+		  $customername =  $request->customername;
+		  $Reason =  $request->Reason;
+		  $Description =  $request->Description;
+          $Subject =  $request->Subject;
+		  $Received =  $request->Received;
+		  $priority =  $request->priority;
+		  $assign =  $request->assign;
+		  $department =  $request->department;
+          $ticketstatus =  $request->ticketstatus;
+		  $duedate =  $request->duedate;
+		  $phonenumber =  $request->phonenumber;
+		  $policynumber =  $request->policynumber;
+		  $ticketid = $request->ticketid;
+
+		  $insert = $this->User_model->Updateservices($ticketid,$customername,$Reason,$Description,$Subject,$Received,$priority,$assign,$department,$ticketstatus,$duedate,$phonenumber,$policynumber);
+		
+		  if($insert)
+		   {
+              echo json_encode(array('error' => false,'msg' => 'Updated Sucessfully', 'bgclr' => '#4CAF50 !important'));
+		   }	
+		  else{
+
+			echo json_encode(array('error' => true,'msg' => 'Something Wrong', 'bgclr' => '#d2382d !important'));
+		  }
+
+		}
+	}
+
 
     public function createcampaign()
 	{
@@ -438,11 +474,6 @@ class User extends CI_Controller {
 
 	}
 
-
-
-
-
-
 	public function viewcustomer()
 	{
 		$all_customer = $this->User_model->customer_details();
@@ -471,10 +502,14 @@ class User extends CI_Controller {
 		 $pagestart = $page * 10;
 		 $pageend = $pagestart - 10;
 
+		
+			$iserviceview = 0;
+		 
+
 		 foreach($allcontacts as $singlerow)
 		  {
-			  $i++;
-			  $all[] = array('userid' => $singlerow->id,'destinationumber' => $singlerow->destinationumber,'dialer' => $singlerow->dialer,'startTime' => $singlerow->startTime,'StartDate' => $singlerow->StartDate,'StopTime' => $singlerow->StopTime,'StopDate' => $singlerow->StopDate,'Prio' => $singlerow->Prio,'CallTag_name' =>$singlerow->CallTag_name,'CallTag_Trackid' => $singlerow->CallTag_Trackid );
+			  $iserviceview++;
+			  $all[] = array('slno' => $iserviceview ,'userid' => $singlerow->id,'destinationumber' => $singlerow->destinationumber,'dialer' => $singlerow->dialer,'startTime' => $singlerow->startTime,'StartDate' => $singlerow->StartDate,'StopTime' => $singlerow->StopTime,'StopDate' => $singlerow->StopDate,'Prio' => $singlerow->Prio,'CallTag_name' =>$singlerow->CallTag_name,'CallTag_Trackid' => $singlerow->CallTag_Trackid );
 
 		  }
 
@@ -483,26 +518,43 @@ class User extends CI_Controller {
           echo json_encode($json);
 	 }
 
-	 public function allservices($sort="2d242uyz",$order='asc',$page=1)
+	 public function allservices($sort="2d242uyz",$name='Imp',$assignsort='0', $page=1,$order='asc')
 	 {
+   
+	    // echo $sort . '-' . $order .'-'.$page.'-'.$name; return;
+
 		if($sort == 'CustomerName') { $sort = 'customer_name'; }  
+		if($sort == 'slno') { $sort = 'id'; }  
+	
 		 $totalservice = $this->User_model->totalservices();
-		 $allservices = $this->User_model->allservices($sort,$order,$page);
+		 $allservices = $this->User_model->allservices($sort,$order,$page,$name,$assignsort);
 		 $totalcount = count($allservices);
 		 $totalservice_ct = count($totalservice);
-		 $i = 0;
-		 
-        
 
+		
+			$iserviceview = 0;
+		
+		 
 		 $pagestart = $page * 10;
 		 $pageend = $pagestart - 10;
 
-		 foreach($allservices as $singlerow)
+		 if(count($allservices)!=0){
+		   
+			foreach($allservices as $singlerow)
 		  {
-			  $i++;
-			  $all[] = array('ticket_id' => $singlerow->ticket_id,'customer_name' => $singlerow->customer_name,'phonenumber' => $singlerow->phonenumber,'department' => $singlerow->department,'assign' => $singlerow->assign,'duedate' => $singlerow->duedate);
-
+			  $iserviceview++;
+		   if($singlerow->assign == 1) { $assign = 'Ram'; }else if($singlerow->assign == 2){ $assign = 'Sangeeth';}else{ $assign ='';}
+		   if($singlerow->ticketstatus == 'Open') { $ticketcss = 'badge-success'; } else if($singlerow->ticketstatus == 'Closed') { $ticketcss = 'badge-warning'; }
+		   
+			  $all[] = array('slno' =>$iserviceview,'ticket_id' => $singlerow->ticket_id,'customer_name' => $singlerow->customer_name,'phonenumber' => $singlerow->phonenumber,'department' => $singlerow->department,'assign' => $assign,'duedate' => $singlerow->duedate,'ticketStatus' => $singlerow->ticketstatus,'ticketstyle' =>  $ticketcss);
 		  }
+
+		 }else{
+
+			$all = array();
+		 }
+
+		 
 
 		  $json = array('total_count' => $totalservice_ct,'items' => $all,'sort' => $sort,'order' =>$order,'page' => $page,'pageend' => $pageend,'pagestart' => $pagestart);
 
@@ -590,6 +642,202 @@ class User extends CI_Controller {
 		}
 
 	 }
+
+	 public function servicesdetailedview($key)
+     {
+		$check_services_details = $this->User_model->singledeatils($key);
+
+		if(count($check_services_details)!=0)
+		{
+           if($check_services_details->assign == 1) { $assign = 'Ram'; }else if($check_services_details->assign == 2){ $assign = 'Sangeeth';}else{ $assign ='';}
+		   if($check_services_details->ticketstatus == 'Open') { $ticketcss = 'badge-success'; } else if($check_services_details->ticketstatus == 'Closed') { $ticketcss = 'badge-warning'; }
+		   
+		   if($check_services_details->createtime) { $createdate = date('d-M-Y',strtotime($check_services_details->createtime));   }
+		   else {
+			$createdate = '' ;
+		   }
+
+		   $duedate = date('d-M-Y',strtotime($check_services_details->duedate));	
+		   echo json_encode(array('error' => false ,'msg'=> 'services loading','Name' =>$check_services_details->customer_name,
+		   'reason' => $check_services_details->reasonforcall,'Description' =>	$check_services_details->description,'createDate' => $createdate ,
+		   'duedate' => $duedate,'subject' => $check_services_details->subject ,'Received' => $check_services_details->received,'Priority' => $check_services_details->priority,
+		   'assign' => $assign,'department' => $check_services_details->department,'ticketstatus' => $check_services_details->ticketstatus,'phonenumber' => $check_services_details->phonenumber,
+		   'policynumber' => $check_services_details->policynumber,'btnstyle' => $ticketcss ));
+		}else{
+
+			echo json_encode(array('error' => true ,'msg'=> 'services not loading'));
+
+		}
+
+	 }
+
+
+	 public function servicesdetailededit($key)
+     {
+		$check_services_details = $this->User_model->singledeatils($key);
+
+		if(count($check_services_details)!=0)
+		{
+           if($check_services_details->assign == 1) { $assign = 'Ram'; }else if($check_services_details->assign == 2){ $assign = 'Sangeeth';}else{ $assign ='';}
+		   if($check_services_details->ticketstatus == 'Open') { $ticketcss = 'badge-success'; } else if($check_services_details->ticketstatus == 'Closed') { $ticketcss = 'badge-warning'; }
+		   
+		   if($check_services_details->createtime) { $createdate = date('d-M-Y',strtotime($check_services_details->createtime));   }
+		   else {
+			$createdate = '' ;
+		   }
+
+		   $duedate = date('d-M-Y',strtotime($check_services_details->duedate));	
+		   echo json_encode(array('error' => false ,'msg'=> 'services loading','Name' =>$check_services_details->customer_name,
+		   'reason' => $check_services_details->reasonforcall,'Description' =>	$check_services_details->description,'createDate' => $createdate ,
+		   'duedate' => $duedate,'subject' => $check_services_details->subject ,'Received' => $check_services_details->received,'Priority' => $check_services_details->priority,
+		   'assign' => $check_services_details->assign,'department' => $check_services_details->department,'ticketstatus' => $check_services_details->ticketstatus,'phonenumber' => $check_services_details->phonenumber,
+		   'policynumber' => $check_services_details->policynumber,'btnstyle' => $ticketcss ));
+		}else{
+
+			echo json_encode(array('error' => true ,'msg'=> 'services not loading'));
+
+		}
+
+	 }
+
+
+	 public function taskcomments($key)
+	 {
+		$allthekeycomments = $this->User_model->taskcomments($key);
+
+		if(count($allthekeycomments)!=0)
+		{
+			foreach($allthekeycomments as $comments)
+		    {
+                 $all[] = array('comments' => $comments->message,'name' => 'Administrator', 'time' =>$comments->comment_time );
+			}
+			
+			echo json_encode($all);
+
+		}else{
+            $all = array();
+			echo json_encode($all);
+		}
+	 }
+
+	public function auditdeatils($key)
+	{
+		$allauditdeatils = $this->User_model->auditdeatils($key);
+
+		if(count($allauditdeatils)!=0)
+		{
+			foreach($allauditdeatils as $audit)
+		    {
+                 $all[] = array('heading' => $audit->heading,'message' => $audit->message, 'time' =>$audit->generate_date );
+			}
+			
+			echo json_encode($all);
+
+		}else{
+            $all = array();
+			echo json_encode($all);
+		}
+	}
+
+
+
+
+
+
+
+	 public function createtaskcomment()
+	 {
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		if($request)
+		{
+			$comment = $request->comment;
+			$taskid = $request->tskid;
+			$addcomment = $this->User_model->addcomment($comment,$taskid);
+
+			if($addcomment)
+			{
+				echo json_encode(array('error' => false ,'msg'=> 'sucess'));
+			}else{
+				echo json_encode(array('error' => true ,'msg'=> 'something wrong'));
+			}
+		}
+		else{
+
+            echo json_encode("nothing to show");
+		}
+	 }
+
+
+	 public function user_check_details()
+	 {
+	
+		$postdata = file_get_contents("php://input");
+		$request = json_decode($postdata);
+
+		 if($request){
+
+		$username = $request->UsernameVal;
+		$password = $request->PasswordVal;
+
+		$check = $this->User_model->checkUser($username,$password);
+
+		if(count($check)!=0)
+		{
+			$this->session->set_userdata('rewqfdsas',$check->id);
+			//session_start();
+			//$_SESSION["favcolor"] = "green";
+			echo json_encode(array('error' => false,'message' => 'Sucess'));
+		}
+		else{
+			echo json_encode(array('error' => true,'message' => 'somthing wrong'));
+		}
+
+		
+		    }else{
+			
+			echo json_encode(array('error' => true,'message' => 'somthing missing'));
+		     }
+
+	 }
+
+	 public function rewqfdsa()
+	 {
+		//$this->load->library('session');
+		$this->session->set_userdata('rewqfdsas','1');
+
+	 }
+
+
+
+	 public function chceklg()
+	 {
+		// echo $this->session->userdata('rewqfdsa'); return;
+		//session_start();
+		 if($this->session->userdata('rewqfdsas'))
+		 {
+             echo json_encode(array('status' => true));
+		 }
+		 else{
+			echo json_encode(array('status' => false));
+		 }
+	 }
+   
+	 public function chceklghome()
+	 {
+		// echo $this->session->userdata('rewqfdsa'); return;
+		//session_start();
+		 if($this->session->userdata('rewqfdsas'))
+		 {
+             echo json_encode(array('error' => true, 'message' => 'sucess'));
+		 }
+		 else{
+			echo json_encode(array('error' => false, 'message' => 'failed'));
+		 }
+	 }
+
+
 
 
 
